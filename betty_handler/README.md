@@ -32,6 +32,6 @@ Run the Betty Handler on your C files:
 
 ### Usage
 
-python betty_handler.py file1.c file2.c ...
+python3 betty_handler.py file1.c file2.c ...
 ```
 This will create a 'tasks' directory, copy specified files, and modify the main files to include only necessary '#include' lines.
