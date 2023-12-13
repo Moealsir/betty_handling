@@ -20,7 +20,7 @@ Make sure you have `betty` installed. You can download Betty from [here](https:/
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/betty-formatter.git
+git clone https://github.com/Moealsir/betty_handling.git
 ```
 Copy script to Home
 ```bash
