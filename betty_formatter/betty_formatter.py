@@ -12,6 +12,24 @@ def capture_and_display_betty_errors(file_paths):
             for error in errors:
                 print(error)
 
+def fix_brace_placement_conditions(content):
+    # Add a new feature: open braces '{' following conditions go on the next line
+    keywords = r'\b(?:if|else|while|for|switch|do|else if|case|default|try|catch|finally|return)\b'
+    content = re.sub(rf'({keywords}\s*\(.*\))\s*{{', r'\1\n{', content)
+
+    # Handle "else {" case
+    content = re.sub(r'else\s*{', 'else\n{', content)
+
+    # Handle "} else {" case
+    content = re.sub(r'}\s*else\s*{', '}\nelse\n{', content)
+
+    return content
+
+def fix_brace_placement(content):
+    # Add a new feature: open braces '{' following function declarations go on the next line
+    function_keywords = r'\b(?:int|void|char|float|double|long|unsigned|signed|static|const|inline)\b'
+    return re.sub(rf'({function_keywords}\s+\w+\s*\(.*\))\s*{{', r'\1\n{', content)
+
 def replace_spaces_with_tabs(content):
     # Replace spaces with tabs in the leading whitespace of lines
     return re.sub(r'^[ ]+', lambda x: '\t' * (len(x.group(0)) // 8), content, flags=re.MULTILINE)
@@ -54,10 +72,10 @@ def fix_betty_style(file_paths):
         with open(file_path, 'r') as file:
             content = file.read()
 
-        # Remove single-line comments
-        content = remove_single_line_comments(content)
-
         # Apply fixes in a specific order
+        content = fix_brace_placement(content)
+        content = fix_brace_placement_conditions(content)
+        content = remove_single_line_comments(content)
         content = replace_spaces_with_tabs(content)
         content = add_parentheses_around_return(content)
         content = add_space_after_comma(content)
