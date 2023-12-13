@@ -31,6 +31,6 @@ cp betty_formatter.py ~/.betty_formatter.py
 
 Run the Betty Formatter on your C files:
 ```bash
-python ~/.betty_formatter.py file1.c file2.c ...
+python3 ~/.betty_formatter.py file1.c file2.c ...
 ```
 This will display errors, fix the style issues, and update the files in-place.
