@@ -23,7 +23,6 @@ def copy_files_to_tasks(files):
             with open(destination_path, 'w') as destination_file:
                 destination_file.write(''.join(filtered_content))
 
-
 def modify_main_files(files):
     # Modify main files
     for file_path in files:
@@ -34,9 +33,9 @@ def modify_main_files(files):
         # Keep only lines with #include that end with '.h"'
         include_lines = [line.strip() for line in content if line.strip().startswith("#include") and line.strip().endswith('.h"')]
 
-        # Write the modified content to the main file
+        # Write the modified content to the main file, adding an empty line at the end
         with open(file_path, 'w') as main_file:
-            main_file.write('\n'.join(include_lines + [f'#include "tasks/{os.path.basename(file_path)}"']))
+            main_file.write('\n'.join(include_lines + [f'#include "tasks/{os.path.basename(file_path)}"\n']))
 
 if __name__ == "__main__":
     # Check if the correct number of arguments is provided
@@ -54,4 +53,3 @@ if __name__ == "__main__":
     modify_main_files(sys.argv[1:])
 
     print("Tasks directory and main files modified successfully.")
-
