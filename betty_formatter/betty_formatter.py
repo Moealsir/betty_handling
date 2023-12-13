@@ -12,6 +12,14 @@ def capture_and_display_betty_errors(file_paths):
             for error in errors:
                 print(error)
 
+def fix_main_declaration(content):
+    # Fix main declaration: int main() should be int main(void)
+    return re.sub(r'\b(int\s+main\s*\(\s*\))', r'int main(void)', content)
+    
+def fix_space_before_open_parenthesis(content):
+    # Fix space between function name and open parenthesis
+    return re.sub(r'(\b\w+\s+)\(', r'\1(', content)
+
 def fix_brace_placement_conditions(content):
     # Add a new feature: open braces '{' following conditions go on the next line
     keywords = r'\b(?:if|else|while|for|switch|do|else if|case|default|try|catch|finally|return)\b'
@@ -73,8 +81,10 @@ def fix_betty_style(file_paths):
             content = file.read()
 
         # Apply fixes in a specific order
+        content = fix_space_before_open_parenthesis(content)
         content = fix_brace_placement(content)
         content = fix_brace_placement_conditions(content)
+        content = fix_main_declaration(content)
         content = remove_single_line_comments(content)
         content = replace_spaces_with_tabs(content)
         content = add_parentheses_around_return(content)
