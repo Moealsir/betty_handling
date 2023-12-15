@@ -39,15 +39,22 @@ def fix_main_declaration(content):
 def fix_space_before_open_parenthesis(content):
     # Fix space between function name and open parenthesis
     return re.sub(r'(\b\w+\s+)\(', r'\1(', content)
-    
+
 def add_newline_after_semicolon(content):
     # Add a newline after semicolon before closing brace '}' if needed
-    return re.sub(r';(\s*})', r';\n\1', content)
+    return re.sub(r';\s*(?=[^\s\n])', r';\n', content)
+
+def remove_spaces_around_semicolon(content):
+    # Remove spaces before and after semicolon
+    return re.sub(r'\s*;\s*', ';', content)
 
 def fix_brace_placement_conditions(content):
     # Add a new feature: open braces '{' following conditions go on the next line
     keywords = r'\b(?:if|else|while|for|switch|do|else if|case|default|try|catch|finally|return)\b'
+    struct_pattern = r'\bstruct\s+\w+\s*{'
+    
     content = re.sub(rf'({keywords}\s*\(.*\))\s*{{', r'\1\n{', content)
+    content = re.sub(rf'({struct_pattern})', r'\1\n{', content)
 
     # Handle "else {" case
     content = re.sub(r'else\s*{', 'else\n{', content)
@@ -60,7 +67,12 @@ def fix_brace_placement_conditions(content):
 def fix_brace_placement(content):
     # Add a new feature: open braces '{' following function declarations go on the next line
     function_keywords = r'\b(?:int|void|char|float|double|long|unsigned|signed|static|const|inline)\b'
-    return re.sub(rf'({function_keywords}\s+\w+\s*\(.*\))\s*{{', r'\1\n{', content)
+    struct_pattern = r'\bstruct\s+\w+\s*{'
+    
+    content = re.sub(rf'({function_keywords}\s+\w+\s*\(.*\))\s*{{', r'\1\n{', content)
+    content = re.sub(rf'({struct_pattern})', r'\1\n{', content)
+
+    return content
 
 def add_parentheses_around_return(content):
     # Add parentheses around return values if not already present
@@ -91,7 +103,7 @@ def remove_consecutive_blank_lines(content):
 def remove_trailing_whitespaces(content):
     # Remove trailing whitespaces at the end of lines
     return re.sub(r'[ \t]+$', '', content, flags=re.MULTILINE)
-
+    
 def add_line_without_newline(file_path, line):
     # Add a line without a newline at the end of the file if not found
     with open(file_path, 'r') as file:
@@ -109,6 +121,19 @@ def run_vi_script(file_path):
     # Run the vi command with gg=G using the -c option
     subprocess.run(['vi', '-c', 'normal! gg=G', '-c', 'wq', filename])
 
+def fix_betty_warnings(content):
+    # Apply fixes for warnings in a specific order
+    content = fix_space_before_open_parenthesis(content)
+    content = fix_brace_placement(content)
+    content = fix_brace_placement_conditions(content)
+    content = fix_main_declaration(content)
+    content = remove_spaces_around_semicolon(content)
+    content = add_newline_after_semicolon(content)
+    content = add_parentheses_around_return(content)
+    content = add_space_after_comma(content)
+    
+    return content
+
 def fix_betty_style(file_paths):
     for file_path in file_paths:
         create_backup(file_path)  # Create a backup before making changes
@@ -116,17 +141,12 @@ def fix_betty_style(file_paths):
         with open(file_path, 'r') as file:
             content = file.read()
 
-        # Apply fixes in a specific order
-        content = fix_space_before_open_parenthesis(content)
-        content = fix_brace_placement(content)
-        content = fix_brace_placement_conditions(content)
-        content = fix_main_declaration(content)
         content = remove_single_line_comments(content)
-        content = add_parentheses_around_return(content)
-        content = add_space_after_comma(content)
         content = remove_consecutive_blank_lines(content)
         content = remove_trailing_whitespaces(content)
-        content = add_newline_after_semicolon(content)
+
+        # Apply fixes for warnings
+        content = fix_betty_warnings(content)
 
         # Write the fixed content back to the file
         with open(file_path, 'w') as file:
