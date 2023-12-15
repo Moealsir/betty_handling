@@ -31,7 +31,6 @@ def capture_and_display_betty_errors(file_paths):
         except Exception as e:
             print(f"Unexpected error in capture_and_display_betty_errors for {file_path}: {e}")
 
-
 def fix_main_declaration(content):
     # Fix main declaration: int main() should be int main(void)
     return re.sub(r'\b(int\s+main\s*\(\s*\))', r'int main(void)', content)
